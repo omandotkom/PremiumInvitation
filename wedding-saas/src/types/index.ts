@@ -37,7 +37,7 @@ export interface VenueConfig {
 }
 
 export interface FloorConfig {
-  type: 'checkerboard' | 'solid' | 'wood';
+  type: 'checkerboard' | 'solid' | 'wood' | 'sand';
   colors?: string[];
   color?: string;
   size?: number;

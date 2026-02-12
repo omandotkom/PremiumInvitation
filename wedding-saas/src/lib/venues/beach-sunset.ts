@@ -20,7 +20,7 @@ export const BeachSunsetConfig: VenueConfig = {
   },
   components: {
     floor: {
-      type: 'solid',
+      type: 'sand',
       color: '#F4E4C1', // Sand color
     },
     aisle: {

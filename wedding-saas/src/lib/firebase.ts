@@ -1,6 +1,6 @@
-import { initializeApp, getApps } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getStorage } from 'firebase/storage';
+import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
+import { getAuth, Auth } from 'firebase/auth';
+import { getStorage, FirebaseStorage } from 'firebase/storage';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -11,9 +11,14 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+// MOCKING FIREBASE FOR DEVELOPMENT WITHOUT API KEYS
+// const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+// export const auth = getAuth(app);
+// export const storage = getStorage(app);
+// export default app;
 
-export const auth = getAuth(app);
-export const storage = getStorage(app);
-
+// Mock Exports to prevent import errors in other files
+export const auth = {} as Auth;
+export const storage = {} as FirebaseStorage;
+const app = {} as FirebaseApp;
 export default app;

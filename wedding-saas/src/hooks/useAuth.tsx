@@ -1,16 +1,17 @@
 'use client';
 
 import { useEffect, useState, createContext, useContext, ReactNode } from 'react';
-import {
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signInWithPopup,
-  GoogleAuthProvider,
-  signOut,
-  User as FirebaseUser,
-} from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { User as FirebaseUser } from 'firebase/auth';
+
+// Mock Firebase User
+const MOCK_USER: Partial<FirebaseUser> = {
+  uid: 'mock-user-123',
+  email: 'user@example.com',
+  displayName: 'Mock User',
+  photoURL: 'https://ui.shadcn.com/avatars/01.png',
+  emailVerified: true,
+  getIdToken: async () => 'mock-token-xyz',
+};
 
 interface AuthContextValue {
   user: FirebaseUser | null;
@@ -25,38 +26,44 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<FirebaseUser | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Default to logged in with mock user for development convenience
+  const [user, setUser] = useState<FirebaseUser | null>(MOCK_USER as FirebaseUser); 
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      setUser(firebaseUser);
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, []);
+  // No useEffect needed for mock auth
 
   const loginWithEmail = async (email: string, password: string) => {
-    await signInWithEmailAndPassword(auth, email, password);
+    setLoading(true);
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    setUser({ ...MOCK_USER, email } as FirebaseUser);
+    setLoading(false);
   };
 
   const registerWithEmail = async (email: string, password: string) => {
-    await createUserWithEmailAndPassword(auth, email, password);
+    setLoading(true);
+    await new Promise(resolve => setTimeout(resolve, 500));
+    setUser({ ...MOCK_USER, email } as FirebaseUser);
+    setLoading(false);
   };
 
   const loginWithGoogle = async () => {
-    const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
+    setLoading(true);
+    await new Promise(resolve => setTimeout(resolve, 500));
+    setUser(MOCK_USER as FirebaseUser);
+    setLoading(false);
   };
 
   const logout = async () => {
-    await signOut(auth);
+    setLoading(true);
+    await new Promise(resolve => setTimeout(resolve, 500));
+    setUser(null);
+    setLoading(false);
   };
 
   const getIdToken = async () => {
     if (!user) return null;
-    return await user.getIdToken();
+    return 'mock-token-xyz';
   };
 
   const value: AuthContextValue = {
