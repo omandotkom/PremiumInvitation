@@ -27,6 +27,21 @@ export interface VenueConfig {
   };
   environment: {
     backgroundColor: string;
+    backgroundImageUrl?: string;
+    interiorPreset?: 'cathedral';
+    assetKit?: 'church-classic-v1';
+    altarBackdrop?: {
+      imageUrl: string;
+      width: number;
+      height: number;
+      y: number;
+      zOffset?: number;
+      opacity?: number;
+      depth?: number;
+      wallColor?: string;
+      frameColor?: string;
+      frameThickness?: number;
+    };
     fog?: {
       color: string;
       near: number;

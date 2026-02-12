@@ -10,6 +10,11 @@ interface ParticleFieldProps {
   isMobile?: boolean;
 }
 
+function seededNoise(seed: number) {
+  const x = Math.sin(seed * 12.9898) * 43758.5453;
+  return x - Math.floor(x);
+}
+
 export function ParticleField({ config, isMobile = false }: ParticleFieldProps) {
   const meshRef = useRef<THREE.Points>(null);
   const count = isMobile ? Math.floor(config.count / 2) : config.count;
@@ -19,13 +24,20 @@ export function ParticleField({ config, isMobile = false }: ParticleFieldProps) 
     const vel = new Float32Array(count * 3);
 
     for (let i = 0; i < count; i++) {
-      pos[i * 3] = (Math.random() - 0.5) * 10;
-      pos[i * 3 + 1] = Math.random() * 5;
-      pos[i * 3 + 2] = (Math.random() - 0.5) * 20;
+      const n1 = seededNoise(i * 11 + 1);
+      const n2 = seededNoise(i * 17 + 2);
+      const n3 = seededNoise(i * 23 + 3);
+      const n4 = seededNoise(i * 29 + 4);
+      const n5 = seededNoise(i * 31 + 5);
+      const n6 = seededNoise(i * 37 + 6);
 
-      vel[i * 3] = (Math.random() - 0.5) * 0.01;
-      vel[i * 3 + 1] = Math.random() * 0.01 + 0.002;
-      vel[i * 3 + 2] = (Math.random() - 0.5) * 0.01;
+      pos[i * 3] = (n1 - 0.5) * 10;
+      pos[i * 3 + 1] = n2 * 5;
+      pos[i * 3 + 2] = (n3 - 0.5) * 20;
+
+      vel[i * 3] = (n4 - 0.5) * 0.008;
+      vel[i * 3 + 1] = n5 * 0.009 + 0.002;
+      vel[i * 3 + 2] = (n6 - 0.5) * 0.008;
     }
 
     return [pos, vel];
@@ -50,8 +62,10 @@ export function ParticleField({ config, isMobile = false }: ParticleFieldProps) 
 
       if (positionArray[i * 3 + 1] > 5) {
         positionArray[i * 3 + 1] = 0;
-        positionArray[i * 3] = (Math.random() - 0.5) * 10;
-        positionArray[i * 3 + 2] = (Math.random() - 0.5) * 20;
+        const n1 = seededNoise(i * 41 + positionArray[i * 3 + 1] + 7);
+        const n2 = seededNoise(i * 43 + positionArray[i * 3 + 2] + 9);
+        positionArray[i * 3] = (n1 - 0.5) * 10;
+        positionArray[i * 3 + 2] = (n2 - 0.5) * 20;
       }
     }
 
@@ -61,10 +75,12 @@ export function ParticleField({ config, isMobile = false }: ParticleFieldProps) 
   return (
     <points ref={meshRef} geometry={geometry}>
       <pointsMaterial
-        size={0.05}
+        size={isMobile ? 0.045 : 0.06}
         color={config.color}
         transparent
-        opacity={0.6}
+        opacity={0.72}
+        blending={THREE.AdditiveBlending}
+        depthWrite={false}
         sizeAttenuation
       />
     </points>

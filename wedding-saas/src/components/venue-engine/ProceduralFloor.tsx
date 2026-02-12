@@ -10,6 +10,11 @@ interface ProceduralFloorProps {
   length: number;
 }
 
+function seededNoise(seed: number) {
+  const x = Math.sin(seed * 12.9898) * 43758.5453;
+  return x - Math.floor(x);
+}
+
 export function ProceduralFloor({ config, width, length }: ProceduralFloorProps) {
   const geometry = useMemo(() => new THREE.PlaneGeometry(width, length), [width, length]);
 
@@ -26,6 +31,15 @@ export function ProceduralFloor({ config, width, length }: ProceduralFloorProps)
         for (let x = 0; x < 512; x += size) {
           ctx.fillStyle = ((x + y) / size) % 2 === 0 ? config.colors![0] : config.colors![1];
           ctx.fillRect(x, y, size, size);
+        }
+      }
+
+      for (let y = 0; y < 512; y += 4) {
+        for (let x = 0; x < 512; x += 4) {
+          const n = seededNoise(x * 17 + y * 131);
+          const alpha = 0.02 + n * 0.04;
+          ctx.fillStyle = `rgba(0,0,0,${alpha.toFixed(4)})`;
+          ctx.fillRect(x, y, 4, 4);
         }
       }
       
@@ -55,12 +69,17 @@ export function ProceduralFloor({ config, width, length }: ProceduralFloorProps)
       // Add grain noise
       // Simple noise function
       for (let i = 0; i < 50000; i++) {
-        const x = Math.random() * 1024;
-        const y = Math.random() * 1024;
-        const w = Math.random() * 100 + 20; // Stretched width for grain
-        const h = Math.random() * 2 + 1;    // Thin height
+        const n1 = seededNoise(i * 13 + 17);
+        const n2 = seededNoise(i * 29 + 37);
+        const n3 = seededNoise(i * 47 + 53);
+        const n4 = seededNoise(i * 61 + 71);
+        const n5 = seededNoise(i * 79 + 97);
+        const x = n1 * 1024;
+        const y = n2 * 1024;
+        const w = n3 * 100 + 20; // Stretched width for grain
+        const h = n4 * 2 + 1;    // Thin height
         
-        ctx.fillStyle = Math.random() > 0.5 ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)';
+        ctx.fillStyle = n5 > 0.5 ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)';
         ctx.fillRect(x, y, w, h);
       }
 
@@ -107,7 +126,7 @@ export function ProceduralFloor({ config, width, length }: ProceduralFloorProps)
       
       for (let i = 0; i < data.length; i += 4) {
         // Random variation: -10 to +10
-        const noise = (Math.random() - 0.5) * 20;
+        const noise = (seededNoise(i * 0.37 + 11) - 0.5) * 20;
         
         // Don't modify alpha (data[i+3])
         data[i] = Math.max(0, Math.min(255, data[i] + noise));     // R
@@ -119,8 +138,8 @@ export function ProceduralFloor({ config, width, length }: ProceduralFloorProps)
       
       // Sparkles (Mica in sand)
       for(let i=0; i<500; i++) {
-         const x = Math.random() * 512;
-         const y = Math.random() * 512;
+         const x = seededNoise(i * 19 + 3) * 512;
+         const y = seededNoise(i * 23 + 5) * 512;
          ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
          ctx.fillRect(x, y, 2, 2);
       }

@@ -12,13 +12,36 @@ interface ProceduralAltarProps {
 export function ProceduralAltar({ config, position }: ProceduralAltarProps) {
   const altarGroup = useMemo(() => {
     const group = new THREE.Group();
+    const platformMaterial = new THREE.MeshStandardMaterial({
+      color: '#efe5d8',
+      roughness: 0.6,
+      metalness: 0.04,
+    });
+
+    const basePlatform = new THREE.Mesh(
+      new THREE.BoxGeometry(config.width + 2.2, 0.32, 2.2),
+      platformMaterial
+    );
+    basePlatform.position.set(0, 0.16, 0);
+    basePlatform.castShadow = true;
+    basePlatform.receiveShadow = true;
+    group.add(basePlatform);
+
+    const topPlatform = new THREE.Mesh(
+      new THREE.BoxGeometry(config.width + 1.4, 0.2, 1.5),
+      platformMaterial
+    );
+    topPlatform.position.set(0, 0.42, 0);
+    topPlatform.castShadow = true;
+    topPlatform.receiveShadow = true;
+    group.add(topPlatform);
 
     if (config.type === 'arch-with-cross') {
       const pillarGeo = new THREE.CylinderGeometry(0.15, 0.15, config.height, 16);
       const pillarMat = new THREE.MeshStandardMaterial({
         color: config.color,
-        metalness: 0.6,
-        roughness: 0.3,
+        metalness: 0.45,
+        roughness: 0.28,
       });
 
       const leftPillar = new THREE.Mesh(pillarGeo, pillarMat);
@@ -39,17 +62,36 @@ export function ProceduralAltar({ config, position }: ProceduralAltarProps) {
 
       const crossV = new THREE.Mesh(
         new THREE.BoxGeometry(0.1, 1, 0.1),
-        pillarMat
+        new THREE.MeshStandardMaterial({
+          color: config.color,
+          emissive: '#ad7d21',
+          emissiveIntensity: 0.35,
+          roughness: 0.24,
+          metalness: 0.5,
+        })
       );
       crossV.position.set(0, config.height - 0.5, -0.2);
+      crossV.castShadow = true;
       group.add(crossV);
 
       const crossH = new THREE.Mesh(
         new THREE.BoxGeometry(0.6, 0.1, 0.1),
-        pillarMat
+        crossV.material
       );
       crossH.position.set(0, config.height - 0.3, -0.2);
+      crossH.castShadow = true;
       group.add(crossH);
+
+      const glowDisc = new THREE.Mesh(
+        new THREE.CircleGeometry(0.5, 36),
+        new THREE.MeshBasicMaterial({
+          color: '#ffdd88',
+          transparent: true,
+          opacity: 0.25,
+        })
+      );
+      glowDisc.position.set(0, config.height - 0.4, -0.27);
+      group.add(glowDisc);
     } else if (config.type === 'floral-arch') {
       const pillarGeo = new THREE.CylinderGeometry(0.2, 0.2, config.height, 16);
       const pillarMat = new THREE.MeshStandardMaterial({
@@ -72,6 +114,7 @@ export function ProceduralAltar({ config, position }: ProceduralAltarProps) {
       });
       const arch = new THREE.Mesh(archGeo, flowerMat);
       arch.position.set(0, config.height, 0);
+      arch.castShadow = true;
       group.add(arch);
     }
 
